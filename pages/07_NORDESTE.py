@@ -58,7 +58,7 @@ st.markdown(f"**Total de máquinas com {sistema_escolhido}:** {len(df_filtrado)}
 
 # Lista de máquinas
 st.subheader("📋 Máquinas Detalhadas")
-st.dataframe(df_filtrado[["Name", "CPU", "Operating system"]].reset_index(drop=True))
+st.dataframe(df_filtrado[["Name", "CPU", "Operating system", "Usuario", "Setor"]].reset_index(drop=True))
 
 
 
