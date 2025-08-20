@@ -1,54 +1,51 @@
 import streamlit as st
+import pandas as pd
 
-st.set_page_config(page_title="Portal Lunelli", page_icon="", layout="wide")
+st.set_page_config(page_title="Portal Lunelli", layout="wide")
 
-# ===== Estilo Lunelli =====
-st.markdown("""
-<style>
-:root {
-  --lunelli-white: #fff;
-  --lunelli-blue: #003366;
-  --lunelli-blue-hover: #004b99;
-  --lunelli-muted: #667085;
-}
-.main-title { 
-  text-align:center; 
-  font-size:40px; 
-  font-weight:800; 
-  color:var(--lunelli-white); 
-  margin: 4px 0 6px 0; 
-}
-.subtitle {
-  text-align:center; 
-  color:var(--lunelli-white); 
-  margin-bottom:28px; 
-}
-.stButton > button {
-  display: block;
-  background: var(--lunelli-blue);
-  margin: 10px auto;
-  width: 250px;
-  font-size: 18px;
-  font-weight: bold;
-  border-radius: 10px;
-  transition: .2s;
-}
-.stButton>button:hover { 
-  background: var(--lunelli-blue-hover);
-  transform: translateY(-1px); 
-}
-.block-container {
-  padding-top: 1.6rem;
-}
-</style>
-""", unsafe_allow_html=True)
+st.title("Portal de Dashboards - Lunelli")
 
-st.markdown("<div class='main-title'> Computadores Lunelli</div>", unsafe_allow_html=True)
-st.markdown("<div class='subtitle'>Selecione uma unidade</div>", unsafe_allow_html=True)
+# Carregar o Excel
+xls = pd.ExcelFile("computadoresLunelliv4.xlsx")
 
-dashboards = {'VESTUARIO': '01_VESTUARIO.py', 'MASSARANDUBA': '02_MASSARANDUBA.py', 'TEXTIL': '03_TEXTIL.py', 'LUIZALVES': '04_LUIZALVES.py', 'COMERCIAL': '05_COMERCIAL.py', 'BENEFICIAMENTOS': '06_BENEFICIAMENTOS.py', 'NORDESTE': '07_NORDESTE.py', 'AVARE': '08_AVARE.py', 'SHOWROOM': '09_SHOWROOM.py', 'LNDLNB': '10_LNDLNB.py', 'OUT': '11_OUT.py', 'PARAGUAI': '12_PARAGUAI.py', 'ABI': '13_ABI.py', 'FORAPADRAO': '14_FORAPADRAO.py', 'CONFECCAO': '15_CONFECCAO.py', 'AJD': '16_AJD.py'}
+st.markdown("### Visão Geral de Máquinas por Unidade")
 
-cols = st.columns(4)
-for i, (aba, arquivo) in enumerate(dashboards.items()):
-    if cols[i % 4].button(aba):
-        st.switch_page(f"pages/{arquivo}")
+# Layout em colunas dinâmico (3 cards por linha)
+cols = st.columns(3)
+i = 0
+
+for sheet in xls.sheet_names:
+    df = pd.read_excel(xls, sheet_name=sheet)
+
+    total = df.shape[0]
+    win10 = df[df["Operating system"].str.contains("Windows 10", case=False, na=False)].shape[0]
+    win11 = df[df["Operating system"].str.contains("Windows 11", case=False, na=False)].shape[0]
+
+    with cols[i]:
+        st.markdown(
+            f"""
+            <div style="
+                background-color:#004080;
+                color:white;
+                text-align:center;
+                padding:20px;
+                border-radius:15px;
+                box-shadow:2px 2px 10px rgba(0,0,0,0.2);
+                font-size:18px;
+                font-weight:bold;
+                margin-bottom:20px;
+            ">
+                {sheet}<br>
+                <span style="font-size:22px;">Total: {total}</span><br>
+                <span style="font-size:18px;">Windows 10: {win10}</span><br>
+                <span style="font-size:18px;">Windows 11: {win11}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+    i += 1
+    if i == 3:  # quebra de linha a cada 3 unidades
+        i = 0
+        st.markdown("<br>", unsafe_allow_html=True)
+        cols = st.columns(3)  # nova linha
