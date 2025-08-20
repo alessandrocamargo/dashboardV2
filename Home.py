@@ -8,7 +8,7 @@ st.title("Portal de Dashboards - Lunelli")
 # Carregar o Excel
 xls = pd.ExcelFile("computadoresLunelliv4.xlsx")
 
-st.markdown("### Visão Geral de Máquinas por Unidade")
+st.markdown("### Total de Máquinas por Unidade")
 
 # Layout em colunas dinâmico (3 cards por linha)
 cols = st.columns(3)
@@ -49,3 +49,29 @@ for sheet in xls.sheet_names:
         i = 0
         st.markdown("<br>", unsafe_allow_html=True)
         cols = st.columns(3)  # nova linha
+# ---------- CARD GERAL ----------
+total_maquinas = 0
+for sheet in xls.sheet_names:
+    df = pd.read_excel(xls, sheet_name=sheet)
+    total_maquinas += df.shape[0]
+
+
+st.markdown("### Total Geral de Máquinas ")
+st.markdown(
+    f"""
+    <div style="
+        background-color:#008000;
+        color:white;
+        text-align:center;
+        padding:25px;
+        border-radius:15px;
+        box-shadow:2px 2px 10px rgba(0,0,0,0.2);
+        font-size:20px;
+        font-weight:bold;
+        margin-bottom:30px;
+    ">
+        <span style="font-size:28px;">{total_maquinas}</span>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
