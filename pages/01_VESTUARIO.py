@@ -1,39 +1,18 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
+from io import BytesIO
 
-st.set_page_config(page_title="Lunelli", page_icon="", layout="wide")
+st.title("Dashboard da Unidade")
 
-# Botão de retorno estilizado
-st.markdown("""
-    <style>
-        .stButton>button {
-            background-color: #ff6600;
-            color: white;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            transition: 0.3s;
-        }
-        .stButton>button:hover {
-            background-color: #e65c00;
-            transform: scale(1.05);
-        }
-    </style>
-""", unsafe_allow_html=True)
+# Carregar Excel
+df = pd.read_excel("computadoresLunelliv4.xlsx", sheet_name="VESTUARIO")
 
 # Título do app
 st.markdown("""
 <div style='text-align: center'>
-    <h1>Unidade: VESTUÁRIO</h1>
+    <h1>Unidade: VESTUARIO</h1>
 </div>
 """, unsafe_allow_html=True)
-
-
-# Carregar dados
-df = pd.read_excel("computadoresLunelliv4.xlsx", sheet_name="VESTUARIO")
 
 # Limpar dados de sistema operacional
 df["Operating system"] = df["Operating system"].astype(str).str.replace("<|>", "", regex=True).str.strip()
@@ -61,4 +40,17 @@ st.subheader("📋 Máquinas Detalhadas")
 st.dataframe(df_filtrado[["Name", "CPU", "Operating system", "Usuario", "Setor"]].reset_index(drop=True))
 
 
+# ---------------------- EXPORTAR ----------------------
+st.markdown("### Exportar dados filtrados")
 
+# Excel
+output = BytesIO()
+with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+    df_filtrado.to_excel(writer, index=False, sheet_name="Filtrado")
+
+st.download_button(
+    label="📥 Exportar Excel",
+    data=output.getvalue(),
+    file_name="vestuario.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)

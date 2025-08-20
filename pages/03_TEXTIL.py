@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from io import BytesIO
 
 # Botão de retorno estilizado
 st.markdown("""
@@ -59,4 +60,17 @@ st.subheader("📋 Máquinas Detalhadas")
 st.dataframe(df_filtrado[["Name", "CPU", "Operating system", "Usuario", "Setor"]].reset_index(drop=True))
 
 
+# ---------------------- EXPORTAR ----------------------
+st.markdown("### Exportar dados filtrados")
 
+# Excel
+output = BytesIO()
+with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+    df_filtrado.to_excel(writer, index=False, sheet_name="Filtrado")
+
+st.download_button(
+    label="📥 Exportar Excel",
+    data=output.getvalue(),
+    file_name="vestuario.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
